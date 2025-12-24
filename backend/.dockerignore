@@ -1,0 +1,45 @@
+# Dependencies
+node_modules
+
+# Build output
+dist
+
+# Testing
+coverage
+test
+*.spec.ts
+*.test.ts
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Lock files (using bun.lockb only)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Environment
+.env*.local
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose*.yml
+
+# Misc
+README.md
+*.md

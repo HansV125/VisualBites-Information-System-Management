@@ -1,0 +1,84 @@
+# Visual Bites - Food Recognition App
+
+services:
+  vb-frontend:
+    build:
+      context: ./vb-frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: https://api-vb.lyst.qzz.io
+    container_name: vb-frontend
+    environment:
+      - NEXT_PUBLIC_API_URL=https://api-vb.lyst.qzz.io
+      - PORT=3000
+    restart: unless-stopped
+    networks:
+      - proxy
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    tmpfs:
+      - /tmp:size=50M
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+  visual-bites-backend:
+    build:
+      context: ./vb-backend
+      dockerfile: Dockerfile
+      args:
+        DATABASE_URL: ${DATABASE_URL}
+    container_name: visual-bites-backend
+    env_file:
+      - .env
+    environment:
+      - PORT=3001
+      - JWT_SECRET=supersecretkey
+      - FRONTEND_URL=https://vb.lyst.qzz.io
+    restart: unless-stopped
+    networks:
+      - proxy
+      - internal
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    tmpfs:
+      - /tmp:size=50M
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+networks:
+  proxy:
+    external: true
+  internal:
+    external: true
